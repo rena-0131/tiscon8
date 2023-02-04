@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.lang.Math;
 
 /**
  * 引越し見積もり機能において業務処理を担当するクラス。
@@ -92,7 +93,7 @@ public class EstimateService {
             priceForOptionalService = estimateDAO.getPricePerOptionalService(OptionalServiceType.WASHING_MACHINE.getCode());
         }
 
-        return priceForDistance + pricePerTruck + priceForOptionalService;
+        return (int)Math.round((priceForDistance + pricePerTruck) * estimateDAO.getSeasonFactor(dto.getPlannedDate()) + priceForOptionalService);
     }
 
     /**

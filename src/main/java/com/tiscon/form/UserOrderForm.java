@@ -6,6 +6,10 @@ import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
+import org.springframework.format.annotation.DateTimeFormat;
+
+import java.sql.Date;
+
 /**
  * 顧客が入力する見積もり情報を保持するクラス。
  *
@@ -35,6 +39,10 @@ public class UserOrderForm {
 
     @NotBlank
     private String newAddress;
+
+    @NotBlank
+    @DateTimeFormat (pattern = "yyyy/MM/dd")
+    private Date plannedDate;
 
     @Numeric
     @NotBlank

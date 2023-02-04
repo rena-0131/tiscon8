@@ -9,6 +9,8 @@ import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.sql.Date;
+import java.util.Calendar;
 
 /**
  * 引越し見積もり機能においてDBとのやり取りを行うクラス。
@@ -146,5 +148,25 @@ public class EstimateDao {
 
         SqlParameterSource paramSource = new MapSqlParameterSource("serviceId", serviceId);
         return parameterJdbcTemplate.queryForObject(sql, paramSource, Integer.class);
+    }
+
+    /**
+     * 引越し予定日を考慮する料金。
+     * 
+     * @param plannedDate 引越し予定日
+     * @return 季節係数
+     */
+    public double getSeasonFactor(Date plannedDate) {
+
+        Calendar cal = Calendar.getInstance();
+        int month = cal.get(Calendar.MONTH) + 1;
+
+        if (month == 3 || month == 4) {
+            return 1.5;
+        } else if (month == 9) {
+            return 1.2;
+        } else {
+            return 1;
+        }
     }
 }
