@@ -137,7 +137,7 @@ public class EstimateController {
         } catch (EmptyResultDataAccessException e) {
             model.addAttribute("prefectures", estimateDAO.getAllPrefectures());
             model.addAttribute("userOrderForm", userOrderForm);
-            model.addAttribute("errors", "too many boxes");
+            model.addAttribute("errors", "段ボールの数が200個以下にしてください");
             return "input";
         }
         
