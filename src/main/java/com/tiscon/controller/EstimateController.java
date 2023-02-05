@@ -1,5 +1,6 @@
 package com.tiscon.controller;
 
+import com.tiscon.code.PackageType;
 import com.tiscon.dao.EstimateDao;
 import com.tiscon.dto.UserOrderDto;
 import com.tiscon.form.UserOrderForm;
@@ -52,9 +53,11 @@ public class EstimateController {
         if (!model.containsAttribute("userOrderForm")) {
             model.addAttribute("userOrderForm", new UserOrderForm());
         }
-
         model.addAttribute("prefectures", estimateDAO.getAllPrefectures());
-        return "input";
+        model.addAttribute("bed_box_num", estimateDAO.getBoxPerPackage(PackageType.BED.getCode()));
+        model.addAttribute("bicycle_box_num", estimateDAO.getBoxPerPackage(PackageType.BICYCLE.getCode()));
+        model.addAttribute("washing_machine_box_num", estimateDAO.getBoxPerPackage(PackageType.WASHING_MACHINE.getCode()));
+return "input";
     }
 
     /**
