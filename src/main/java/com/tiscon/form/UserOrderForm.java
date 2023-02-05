@@ -8,7 +8,7 @@ import javax.validation.constraints.NotNull;
 
 import org.springframework.format.annotation.DateTimeFormat;
 
-import java.sql.Date;
+import java.time.LocalDate;
 
 /**
  * 顧客が入力する見積もり情報を保持するクラス。
@@ -40,9 +40,8 @@ public class UserOrderForm {
     @NotBlank
     private String newAddress;
 
-    @NotBlank
-    @DateTimeFormat (pattern = "yyyy/MM/dd")
-    private Date plannedDate;
+    @DateTimeFormat(pattern="yyyy-MM-dd")
+    private LocalDate plannedDate;
 
     @Numeric
     @NotBlank
@@ -117,6 +116,14 @@ public class UserOrderForm {
 
     public void setNewAddress(String newAddress) {
         this.newAddress = newAddress;
+    }
+
+    public LocalDate getPlannedDate() {
+        return plannedDate;
+    }
+
+    public void setPlannedDate(LocalDate plannedDate) {
+        this.plannedDate = plannedDate;
     }
 
     public String getBox() {
