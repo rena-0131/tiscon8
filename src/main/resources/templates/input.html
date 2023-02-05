@@ -20,6 +20,7 @@
     <div class="page-title">
       お見積り情報入力
     </div>
+    <div th:text="${errors}" style="color: red;"></div>
     <ul th:if="${#fields.hasErrors('all')}">
       <li th:each="err : ${#fields.errors('all')}" th:text="${err}"></li>
     </ul>

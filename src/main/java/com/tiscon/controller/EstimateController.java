@@ -5,6 +5,7 @@ import com.tiscon.dto.UserOrderDto;
 import com.tiscon.form.UserOrderForm;
 import com.tiscon.service.EstimateService;
 import org.springframework.beans.BeanUtils;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -130,8 +131,16 @@ public class EstimateController {
         // 料金の計算を行う。
         UserOrderDto dto = new UserOrderDto();
         BeanUtils.copyProperties(userOrderForm, dto);
-        // dto.setPlannedDate(userOrderForm.getPlannedDate());
-        Integer price = estimateService.getPrice(dto);
+        Integer price;
+        try {
+            price = estimateService.getPrice(dto);
+        } catch (EmptyResultDataAccessException e) {
+            model.addAttribute("prefectures", estimateDAO.getAllPrefectures());
+            model.addAttribute("userOrderForm", userOrderForm);
+            model.addAttribute("errors", "段ボールの数が200個以下にしてください");
+            return "input";
+        }
+        
 
         model.addAttribute("prefectures", estimateDAO.getAllPrefectures());
         model.addAttribute("userOrderForm", userOrderForm);
