@@ -64,6 +64,14 @@ public class EstimateService {
         estimateDAO.batchInsertCustomerPackage(packageList);
     }
 
+    public int getBox(UserOrderDto dto) {
+        int boxes = getBoxForPackage(dto.getBox(), PackageType.BOX)
+                + getBoxForPackage(dto.getBed(), PackageType.BED)
+                + getBoxForPackage(dto.getBicycle(), PackageType.BICYCLE)
+                + getBoxForPackage(dto.getWashingMachine(), PackageType.WASHING_MACHINE);
+        return boxes;
+    }
+
     /**
      * 見積もり依頼に応じた概算見積もりを行う。
      *
@@ -78,10 +86,7 @@ public class EstimateService {
         // 距離当たりの料金を算出する
         int priceForDistance = distanceInt * PRICE_PER_DISTANCE;
 
-        int boxes = getBoxForPackage(dto.getBox(), PackageType.BOX)
-                + getBoxForPackage(dto.getBed(), PackageType.BED)
-                + getBoxForPackage(dto.getBicycle(), PackageType.BICYCLE)
-                + getBoxForPackage(dto.getWashingMachine(), PackageType.WASHING_MACHINE);
+        int boxes = getBox(dto);
 
         // 箱に応じてトラックの種類が変わり、それに応じて料金が変わるためトラック料金を算出する。
         int pricePerTruck = estimateDAO.getPricePerTruck(boxes);
