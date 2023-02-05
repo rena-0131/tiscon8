@@ -1,6 +1,8 @@
 package com.tiscon.domain;
 
 import java.io.Serializable;
+import java.time.LocalDate;
+
 
 public class Customer implements Serializable {
 
@@ -19,6 +21,8 @@ public class Customer implements Serializable {
     private String oldAddress;
 
     private String newAddress;
+
+    private LocalDate plannedDate;
 
     public int getCustomerId() {
         return customerId;
@@ -82,5 +86,13 @@ public class Customer implements Serializable {
 
     public void setNewAddress(String newAddress) {
         this.newAddress = newAddress;
+    }
+
+    public LocalDate getPlannedDate() {
+        return plannedDate;
+    }
+
+    public void setPlannedDate(LocalDate plannedDate) {
+        this.plannedDate = plannedDate;
     }
 }

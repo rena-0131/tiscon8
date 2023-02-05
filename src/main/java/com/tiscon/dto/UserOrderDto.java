@@ -1,5 +1,7 @@
 package com.tiscon.dto;
 
+import java.time.LocalDate;
+
 public class UserOrderDto {
 
     private String customerName;
@@ -15,6 +17,8 @@ public class UserOrderDto {
     private String newPrefectureId;
 
     private String newAddress;
+
+    private LocalDate plannedDate;
 
     private String box;
 
@@ -80,6 +84,14 @@ public class UserOrderDto {
 
     public void setNewAddress(String newAddress) {
         this.newAddress = newAddress;
+    }
+
+    public LocalDate getPlannedDate() {
+        return plannedDate;
+    }
+
+    public void setPlannedDate(LocalDate plannedDate) {
+        this.plannedDate = plannedDate;
     }
 
     public int getBox() {
