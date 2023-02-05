@@ -97,6 +97,9 @@ return "input";
     String backToInput(UserOrderForm userOrderForm, Model model) {
         model.addAttribute("prefectures", estimateDAO.getAllPrefectures());
         model.addAttribute("userOrderForm", userOrderForm);
+        model.addAttribute("bed_box_num", estimateDAO.getBoxPerPackage(PackageType.BED.getCode()));
+        model.addAttribute("bicycle_box_num", estimateDAO.getBoxPerPackage(PackageType.BICYCLE.getCode()));
+        model.addAttribute("washing_machine_box_num", estimateDAO.getBoxPerPackage(PackageType.WASHING_MACHINE.getCode()));
         return "input";
     }
 
@@ -104,7 +107,7 @@ return "input";
      * 確認画面に戻る。
      *
      * @param userOrderForm 顧客が入力した見積もり依頼情報
-     * @param model         遷移先に連携するデータ
+     * @param model         遷移先に連携するデータ  
      * @return 遷移先
      */
     @PostMapping(value = "order", params = "backToConfirm")
@@ -141,10 +144,12 @@ return "input";
             model.addAttribute("prefectures", estimateDAO.getAllPrefectures());
             model.addAttribute("userOrderForm", userOrderForm);
             model.addAttribute("errors", "段ボールの数が200個以下にしてください");
+            model.addAttribute("bed_box_num", estimateDAO.getBoxPerPackage(PackageType.BED.getCode()));
+            model.addAttribute("bicycle_box_num", estimateDAO.getBoxPerPackage(PackageType.BICYCLE.getCode()));
+            model.addAttribute("washing_machine_box_num", estimateDAO.getBoxPerPackage(PackageType.WASHING_MACHINE.getCode()));
             return "input";
         }
         
-
         model.addAttribute("prefectures", estimateDAO.getAllPrefectures());
         model.addAttribute("userOrderForm", userOrderForm);
         model.addAttribute("price", price);
