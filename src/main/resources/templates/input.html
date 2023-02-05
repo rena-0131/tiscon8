@@ -74,15 +74,15 @@
           <input type="text" id="box" name="box" th:field="*{box}" class="form-control" value="10"/>
         </div>
         <div class="form-group">
-          <label for="bed">ベッドの個数</label>
+          <label for="bed">ベッドの個数 (ベッドの個数1個につき段ボール<p style="display: inline;" th:text="${bed_box_num}"></p>箱)</label>
           <input type="text" id="bed" name="bed" th:field="*{bed}" class="form-control" value="3"/>
         </div>
         <div class="form-group">
-          <label for="bicycle">自転車の個数</label>
+          <label for="bicycle">自転車の個数 (自転車の個数1個につき段ボール<p style="display: inline;" th:text="${bicycle_box_num}"></p>箱)</label>
           <input type="text" id="bicycle" name="bicycle" th:field="*{bicycle}" class="form-control" value="1"/>
         </div>
         <div class="form-group">
-          <label for="washingMachine">洗濯機の個数</label>
+          <label for="washingMachine">洗濯機の個数 (洗濯機の個数1個につき段ボール<p style="display: inline;" th:text="${washing_machine_box_num}"></p>箱)</label>
           <input type="text" id="washingMachine" name="washingMachine" th:field="*{washingMachine}" class="form-control"
                  value="1"/>
         </div>
