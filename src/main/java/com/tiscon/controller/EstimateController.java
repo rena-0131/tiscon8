@@ -1,10 +1,12 @@
 package com.tiscon.controller;
 
+import com.tiscon.code.PackageType;
 import com.tiscon.dao.EstimateDao;
 import com.tiscon.dto.UserOrderDto;
 import com.tiscon.form.UserOrderForm;
 import com.tiscon.service.EstimateService;
 import org.springframework.beans.BeanUtils;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -51,9 +53,11 @@ public class EstimateController {
         if (!model.containsAttribute("userOrderForm")) {
             model.addAttribute("userOrderForm", new UserOrderForm());
         }
-
         model.addAttribute("prefectures", estimateDAO.getAllPrefectures());
-        return "input";
+        model.addAttribute("bed_box_num", estimateDAO.getBoxPerPackage(PackageType.BED.getCode()));
+        model.addAttribute("bicycle_box_num", estimateDAO.getBoxPerPackage(PackageType.BICYCLE.getCode()));
+        model.addAttribute("washing_machine_box_num", estimateDAO.getBoxPerPackage(PackageType.WASHING_MACHINE.getCode()));
+return "input";
     }
 
     /**
@@ -93,6 +97,9 @@ public class EstimateController {
     String backToInput(UserOrderForm userOrderForm, Model model) {
         model.addAttribute("prefectures", estimateDAO.getAllPrefectures());
         model.addAttribute("userOrderForm", userOrderForm);
+        model.addAttribute("bed_box_num", estimateDAO.getBoxPerPackage(PackageType.BED.getCode()));
+        model.addAttribute("bicycle_box_num", estimateDAO.getBoxPerPackage(PackageType.BICYCLE.getCode()));
+        model.addAttribute("washing_machine_box_num", estimateDAO.getBoxPerPackage(PackageType.WASHING_MACHINE.getCode()));
         return "input";
     }
 
@@ -100,7 +107,7 @@ public class EstimateController {
      * 確認画面に戻る。
      *
      * @param userOrderForm 顧客が入力した見積もり依頼情報
-     * @param model         遷移先に連携するデータ
+     * @param model         遷移先に連携するデータ  
      * @return 遷移先
      */
     @PostMapping(value = "order", params = "backToConfirm")
@@ -130,9 +137,19 @@ public class EstimateController {
         // 料金の計算を行う。
         UserOrderDto dto = new UserOrderDto();
         BeanUtils.copyProperties(userOrderForm, dto);
-        // dto.setPlannedDate(userOrderForm.getPlannedDate());
-        Integer price = estimateService.getPrice(dto);
-
+        Integer price;
+        try {
+            price = estimateService.getPrice(dto);
+        } catch (EmptyResultDataAccessException e) {
+            model.addAttribute("prefectures", estimateDAO.getAllPrefectures());
+            model.addAttribute("userOrderForm", userOrderForm);
+            model.addAttribute("errors", "段ボールの数が200個以下にしてください");
+            model.addAttribute("bed_box_num", estimateDAO.getBoxPerPackage(PackageType.BED.getCode()));
+            model.addAttribute("bicycle_box_num", estimateDAO.getBoxPerPackage(PackageType.BICYCLE.getCode()));
+            model.addAttribute("washing_machine_box_num", estimateDAO.getBoxPerPackage(PackageType.WASHING_MACHINE.getCode()));
+            return "input";
+        }
+        
         model.addAttribute("prefectures", estimateDAO.getAllPrefectures());
         model.addAttribute("userOrderForm", userOrderForm);
         model.addAttribute("price", price);
