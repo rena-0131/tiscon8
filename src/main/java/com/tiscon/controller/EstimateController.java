@@ -4,6 +4,11 @@ import com.tiscon.dao.EstimateDao;
 import com.tiscon.dto.UserOrderDto;
 import com.tiscon.form.UserOrderForm;
 import com.tiscon.service.EstimateService;
+
+import java.io.IOException;
+
+import javax.xml.parsers.ParserConfigurationException;
+
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -11,6 +16,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.xml.sax.SAXException;
 
 /**
  * 引越し見積もりのコントローラークラス。
@@ -117,9 +123,12 @@ public class EstimateController {
      * @param result        精査結果
      * @param model         遷移先に連携するデータ
      * @return 遷移先
+     * @throws IOException
+     * @throws SAXException
+     * @throws ParserConfigurationException
      */
     @PostMapping(value = "result", params = "calculation")
-    String calculation(@Validated UserOrderForm userOrderForm, BindingResult result, Model model) {
+    String calculation(@Validated UserOrderForm userOrderForm, BindingResult result, Model model) throws ParserConfigurationException, SAXException, IOException {
         if (result.hasErrors()) {
 
             model.addAttribute("prefectures", estimateDAO.getAllPrefectures());

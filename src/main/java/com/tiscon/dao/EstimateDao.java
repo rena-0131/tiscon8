@@ -2,13 +2,34 @@ package com.tiscon.dao;
 
 import com.tiscon.domain.*;
 import org.springframework.dao.IncorrectResultSizeDataAccessException;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.namedparam.*;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
 
+import org.springframework.web.client.RestTemplate;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.util.Arrays;
 import java.util.List;
+import java.io.IOException;
+import java.io.StringReader;
 import java.time.LocalDate;
 
 /**
@@ -107,6 +128,96 @@ public class EstimateDao {
         } catch (IncorrectResultSizeDataAccessException e) {
             distance = 0;
         }
+        return distance;
+    }
+
+    public String getPrefectureName (String prefectureId, String sql) {
+        SqlParameterSource paramSource = new MapSqlParameterSource("prefectureId", prefectureId);
+        String prefecture_name = parameterJdbcTemplate.queryForObject(sql, paramSource, String.class);
+        return prefecture_name;
+    }
+
+    public List<String> getCoordinates(String address) throws ParserConfigurationException, SAXException, IOException {
+        RestTemplate restTemplate = new RestTemplate();
+        HttpHeaders headers = new HttpHeaders();
+        headers.setAccept(Arrays.asList(MediaType.APPLICATION_XML));
+        headers.add("user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.99 Safari/537.36");
+        HttpEntity<String> entity = new HttpEntity<String>("parameters", headers);
+
+        String url = "https://www.geocoding.jp/api/?q=" + address;
+        //String xml = restTemplate.getForObject(url, String.class);
+        ResponseEntity<String> response_xml = restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
+        String xml = response_xml.getBody();
+
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder builder = factory.newDocumentBuilder();
+        InputSource is = new InputSource(new StringReader(xml));
+        Document doc = builder.parse(is);
+
+        Element coord = (Element) doc.getElementsByTagName("coordinate").item(0);
+
+        String lat = coord.getElementsByTagName("lat").item(0).getTextContent();
+        String lon = coord.getElementsByTagName("lon").item(0).getTextContent();
+
+        return Arrays.asList(lon, lat);
+    }
+
+    public double getRouteDistance(List<String> old_coordinate, List<String> new_coordinate) {
+        RestTemplate restTemplate = new RestTemplate();
+
+        String api_key = "5b3ce3597851110001cf6248437e756c4ca94adaa987754b66129748";
+        String url = "https://api.openrouteservice.org/v2/directions/driving-car?api_key=" + api_key 
+                        + "&start="+ old_coordinate.get(0) + "," + old_coordinate.get(1) 
+                        + "&end=" + new_coordinate.get(0) + "," + new_coordinate.get(1);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setAccept(Arrays.asList(MediaType.APPLICATION_XML));
+        headers.add("user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.99 Safari/537.36");
+        HttpEntity<String> entity = new HttpEntity<String>("parameters", headers);
+
+        ResponseEntity<String> response_json = restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
+        String json = response_json.getBody();
+
+        // String json = restTemplate.getForObject(url, String.class);
+        JSONObject route_data = new JSONObject(json);
+        JSONArray features = route_data.getJSONArray("features");
+        JSONObject distance = features.getJSONObject(0).getJSONObject("properties").getJSONObject("summary");
+
+        return distance.getDouble("distance");
+    }
+
+    /**
+     * 実際の距離を取得する。
+     * 
+     * @param prefectureIdFrom
+     * @param oldAddress
+     * @param prefectureIdTo
+     * @param newAddress
+     * @return 距離
+     * @throws IOException
+     * @throws SAXException
+     * @throws ParserConfigurationException
+     */
+    public double getRealDistance (String prefectureIdFrom, String prefectureIdTo, String oldAddress, String newAddress) throws ParserConfigurationException, SAXException, IOException {
+        String sql_old_prefecture = "SELECT PREFECTURE_NAME FROM PREFECTURE WHERE PREFECTURE_ID = " + prefectureIdFrom;
+        String sql_new_prefecture = "SELECT PREFECTURE_NAME FROM PREFECTURE WHERE PREFECTURE_ID = " + prefectureIdTo;
+
+        String old_prefecture_name = this.getPrefectureName(prefectureIdFrom, sql_old_prefecture); 
+        String new_prefecture_name = this.getPrefectureName(prefectureIdTo, sql_new_prefecture); 
+        
+        System.out.println(old_prefecture_name);
+        System.out.println(new_prefecture_name);
+
+        String full_old_address = old_prefecture_name + oldAddress;
+        String full_new_address = new_prefecture_name + newAddress;
+
+        System.out.println(full_old_address);
+        System.out.println(full_new_address);
+
+        List<String> old_coord = this.getCoordinates(full_old_address);
+        List<String> new_coord = this.getCoordinates(full_new_address);
+        
+        double distance = this.getRouteDistance(old_coord, new_coord);
         return distance;
     }
 

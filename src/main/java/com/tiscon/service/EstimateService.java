@@ -10,9 +10,14 @@ import com.tiscon.dto.UserOrderDto;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.xml.sax.SAXException;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.xml.parsers.ParserConfigurationException;
+
+import java.io.IOException;
 import java.lang.Math;
 
 /**
@@ -69,9 +74,14 @@ public class EstimateService {
      *
      * @param dto 見積もり依頼情報
      * @return 概算見積もり結果の料金
+     * @throws IOException
+     * @throws SAXException
+     * @throws ParserConfigurationException
      */
-    public Integer getPrice(UserOrderDto dto) {
-        double distance = estimateDAO.getDistance(dto.getOldPrefectureId(), dto.getNewPrefectureId());
+    public Integer getPrice(UserOrderDto dto) throws ParserConfigurationException, SAXException, IOException {
+        // double distance = estimateDAO.getDistance(dto.getOldPrefectureId(), dto.getNewPrefectureId());
+        double distance = estimateDAO.getRealDistance(dto.getOldPrefectureId(), dto.getNewPrefectureId(), dto.getOldAddress(), dto.getNewAddress());
+        
         // 小数点以下を切り捨てる
         int distanceInt = (int) Math.floor(distance);
 
